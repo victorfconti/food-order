@@ -5,7 +5,13 @@ import br.com.victor.aifude.dtos.AtualizaPratoDTO;
 import br.com.victor.aifude.mappers.PratoMapper;
 import br.com.victor.aifude.models.Prato;
 import br.com.victor.aifude.models.Restaurante;
+import org.eclipse.microprofile.openapi.annotations.enums.SecuritySchemeType;
+import org.eclipse.microprofile.openapi.annotations.security.OAuthFlow;
+import org.eclipse.microprofile.openapi.annotations.security.OAuthFlows;
+import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
+import org.eclipse.microprofile.openapi.annotations.security.SecurityScheme;
 
+import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.ws.rs.*;
@@ -18,6 +24,10 @@ import java.util.Objects;
 @Path("restaurantes/{id}/pratos")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
+@RolesAllowed("proprietario")
+@SecurityScheme(securitySchemeName = "ifood-oauth", type = SecuritySchemeType.OAUTH2,
+        flows = @OAuthFlows(password = @OAuthFlow(tokenUrl = "http://localhost:8081/auth/realms/aifude/protocol/openid-connect/token")))
+@SecurityRequirement(name = "ifood-oauth", scopes = {})
 public class PratosResources {
 
     @Inject
