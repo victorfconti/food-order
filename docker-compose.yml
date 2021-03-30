@@ -6,5 +6,69 @@ services:
     environment:
       POSTGRES_USER: cadastro
       POSTGRES_PASSWORD: cadastro
+      POSTGRES_DB: cadastro
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_cadastro_data:/var/lib/postgresql/data
     ports:
       - 5432:5432
+  postgres_keycloak:
+    container_name: postgres_keycloak
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: keycloak
+      POSTGRES_DB: keycloak
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_keycloak_data:/var/lib/postgresql/data
+    ports:
+      - 5433:5432
+    expose:
+      - 5432
+  keycloak_aifude:
+    container_name: keycloak
+    image: jboss/keycloak
+    environment:
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: admin
+      DB_VENDOR: POSTGRES
+      DB_ADDR: postgres_keycloak
+      DB_PORT: 5432
+      DB_USER: keycloak
+      DB_PASSWORD: keycloak
+    ports:
+      - 8081:8080
+    depends_on:
+      - postgres_keycloak
+  jaeger_aifude:
+    container_name: jaeger_aifude
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - "5775:5775/udp"
+      - "6831:6831/udp"
+      - "6832:6832/udp"
+      - "5778:5778"
+      - "16686:16686"
+      - "14268:14268"
+      - "14250:14250"
+      - "9411:9411"
+  proheus_aifude:
+    container_name: prometheus_aifude
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - 9090:9090
+    network_mode: host
+
+  grafana_aifude:
+    container_name: grafana_aifude
+    image: grafana/grafana:latest
+    network_mode: host
+
+volumes:
+  postgres_keycloak_data:
+    driver: local
+  postgres_cadastro_data:
+    driver: local
