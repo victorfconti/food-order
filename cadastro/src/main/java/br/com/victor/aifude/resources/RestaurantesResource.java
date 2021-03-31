@@ -3,6 +3,9 @@ package br.com.victor.aifude.resources;
 import br.com.victor.aifude.dtos.AdicionaRestauranteDTO;
 import br.com.victor.aifude.mappers.RestauranteMapper;
 import br.com.victor.aifude.models.Restaurante;
+import org.eclipse.microprofile.metrics.annotation.Counted;
+import org.eclipse.microprofile.metrics.annotation.SimplyTimed;
+import org.eclipse.microprofile.metrics.annotation.Timed;
 import org.eclipse.microprofile.openapi.annotations.enums.SecuritySchemeType;
 import org.eclipse.microprofile.openapi.annotations.security.OAuthFlow;
 import org.eclipse.microprofile.openapi.annotations.security.OAuthFlows;
@@ -31,6 +34,9 @@ public class RestaurantesResource {
     RestauranteMapper restauranteMapper;
 
     @GET
+    @Timed(name="Tempo completo de busca")
+    @Counted(name="Quantidade buscas Restaurante")
+    @SimplyTimed(name="Tempo simples de busca")
     public List<Restaurante> obtemTodosRestaurantes(){
         return Restaurante.listAll();
     }
