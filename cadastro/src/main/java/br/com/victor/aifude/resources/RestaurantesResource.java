@@ -11,6 +11,8 @@ import org.eclipse.microprofile.openapi.annotations.security.OAuthFlow;
 import org.eclipse.microprofile.openapi.annotations.security.OAuthFlows;
 import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
 import org.eclipse.microprofile.openapi.annotations.security.SecurityScheme;
+import org.eclipse.microprofile.reactive.messaging.Channel;
+import org.eclipse.microprofile.reactive.messaging.Emitter;
 
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
@@ -33,6 +35,10 @@ public class RestaurantesResource {
     @Inject
     RestauranteMapper restauranteMapper;
 
+    @Inject
+    @Channel("restaurantes")
+    Emitter<Restaurante> emitter;
+
     @GET
     @Timed(name="Tempo completo de busca")
     @Counted(name="Quantidade buscas Restaurante")
@@ -43,9 +49,11 @@ public class RestaurantesResource {
 
     @POST
     @Transactional
-    public void adicionaRestaurante(@Valid AdicionaRestauranteDTO restauranteDTO){
+    public Response adicionaRestaurante(@Valid AdicionaRestauranteDTO restauranteDTO){
         Restaurante restauranteNovo = restauranteMapper.toRestaurante(restauranteDTO);
         Restaurante.persist(restauranteNovo);
+        emitter.send(restauranteNovo);
+        return Response.status(Response.Status.CREATED).build();
     }
 
     @PUT

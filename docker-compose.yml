@@ -12,6 +12,18 @@ services:
       - postgres_cadastro_data:/var/lib/postgresql/data
     ports:
       - 5432:5432
+  postgres_marketplace:
+    container_name: postgres_marketplace_aifude
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: marketplace
+      POSTGRES_PASSWORD: marketplace
+      POSTGRES_DB: marketplace
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_marketplace_data:/var/lib/postgresql/data
+    ports:
+      - 5434:5432
   postgres_keycloak:
     container_name: postgres_keycloak
     image: postgres:latest
@@ -53,6 +65,7 @@ services:
       - "14268:14268"
       - "14250:14250"
       - "9411:9411"
+
   proheus_aifude:
     container_name: prometheus_aifude
     image: prom/prometheus:latest
@@ -67,8 +80,20 @@ services:
     image: grafana/grafana:latest
     network_mode: host
 
+  artemis:
+    container_name: aifude_artemis
+    image: vromero/activemq-artemis:2.11.0
+    network_mode: "host"
+    environment:
+      ARTEMIS_USERNAME: admin
+      ARTEMIS_PASSWORD: admin
+
+
+
 volumes:
   postgres_keycloak_data:
     driver: local
   postgres_cadastro_data:
+    driver: local
+  postgres_marketplace_data:
     driver: local
